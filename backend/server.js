@@ -9,6 +9,7 @@ require("./config/FireConnect");
 connectDB();
 
 app.use("/register", require("./routes/auth/register"));
+app.use("/login", require("./routes/auth/login"));
 
 mongoose.connection.once("open", () => {
   console.log("mongoDB connected");

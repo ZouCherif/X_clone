@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { storage } = require("../config/FireConnect");
 
 const generateTokens = (id, email, username, name) => {
   const accessToken = jwt.sign(
@@ -122,3 +123,54 @@ const login = async (req, res) => {
     res.status(401).json({ message: "Invalid password" });
   }
 };
+
+const handleGoogleAuth = async (req, res) => {
+  if (!req.body.code) return res.status(401).json({ message: "Invalid code" });
+  try {
+    const oAuth2Client = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      "postmessage"
+    );
+    const { tokens } = await oAuth2Client.getToken(req.body.code);
+    const decoded = jwt_decode(tokens.id_token);
+    let user = await User.findOne({ email: decoded.email }).exec();
+    if (!user) {
+      user = await User.create({
+        email: decoded.email,
+        username: decoded.name,
+        name: decoded.name,
+      });
+    }
+    const { accessToken, refreshToken } = generateTokens(
+      user._id,
+      user.email,
+      user.username,
+      user.name
+    );
+
+    user.refreshToken = refreshToken;
+    const result = await user.save();
+
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 30 * 60 * 1000,
+    });
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.json({
+      message: "successfully loged in",
+      accessToken,
+    });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+module.exports = { register, login, handleGoogleAuth };
