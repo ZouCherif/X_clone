@@ -219,4 +219,38 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-module.exports = { register, login, handleGoogleAuth, forgotPassword };
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }, // Check if the token is not expired
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "Invalid or expired token" });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error resetting password" });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  handleGoogleAuth,
+  forgotPassword,
+  resetPassword,
+};
