@@ -4,6 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 3500;
 const mongoose = require("mongoose");
 const connectDB = require("./config/ConnectDB");
+require("./config/FireConnect");
 
 connectDB();
 

@@ -11,12 +11,22 @@ const register = async (req, res) => {
     return res.status(400).json({ message: "email already in use" });
   try {
     const hashedpwd = bcrypt.hash(password, 10);
+
     const newUser = await User.create({
       name,
       email,
       password: hashedpwd,
       username,
     });
+    if (picture) {
+      const storageRef = storage.ref();
+      const pictureRef = storageRef.child(
+        `/users/${newUser._id}/profile_picture/user_${username}_${Date.now()}`
+      );
+      await pictureRef.put(picture);
+      const pictureURL = await pictureRef.getDownloadURL();
+      newUser.picture = pictureURL;
+    }
 
     const accessToken = jwt.sign(
       {
