@@ -4,17 +4,19 @@ import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 function Login() {
   return (
-    <div className="flex flex-col justify-between min-h-screen">
-      <div className="flex text-white flex-1 pt-20">
-        <div className="w-1/2 flex justify-center items-center">
+    <div className="flex flex-col min-h-screen sm:p-0 p-4 overflow-auto">
+      <div className="flex flex-col sm:flex-row justify-center text-white flex-1">
+        <div className="w-1/2 flex sm:justify-center items-center">
           <img
             src={logo}
             alt="logo"
-            className="max-w-[300px] max-h-[300px] mx-auto"
+            className="sm:max-w-[300px] sm:max-h-[300px] max-w-[70px] sm:mx-auto pl-7 mb-16"
           />
         </div>
-        <div className="w-1/2">
-          <h1 className="text-6xl font-bold mb-16">Happening now</h1>
+        <div className="w-1/2 sm:pl-10 pl-7 flex flex-col justify-center">
+          <h1 className="sm:text-6xl text-5xl font-bold mb-14">
+            Happening now
+          </h1>
           <div className="w-[280px]">
             <h2 className="font-bold text-3xl mb-5">Join today.</h2>
             <button className="bg-white rounded-3xl p-2 text-sm text-black flex w-full items-center font-semibold mb-2 justify-center">
