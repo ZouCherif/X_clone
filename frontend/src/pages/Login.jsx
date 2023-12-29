@@ -2,9 +2,14 @@
 import { logo } from "../assets";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
+import { useState } from "react";
+import { SigninPopup, RegisterPopup } from "../components";
 function Login() {
+  const [ShowSignIn, setShowSignIn] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+
   return (
-    <div className="flex flex-col min-h-screen sm:p-0 p-4 overflow-auto">
+    <div className="flex flex-col min-h-screen sm:px-4 sm:py-0 p-4 overflow-auto">
       <div className="flex flex-col sm:flex-row justify-center text-white flex-1">
         <div className="w-1/2 flex sm:justify-center items-center">
           <img
@@ -32,7 +37,10 @@ function Login() {
               <span className="mx-2 text-sm">Or</span>
               <hr className="bg-white w-[120px] opacity-20" />
             </div>
-            <button className="bg-[#1d9bf0] p-2 mb-2 text-center text-sm rounded-3xl w-full font-semibold">
+            <button
+              className="bg-[#1d9bf0] p-2 mb-2 text-center text-sm rounded-3xl w-full font-semibold"
+              onClick={() => setShowRegister(true)}
+            >
               Create account
             </button>
             <p className="text-gray-500 text-[10px] mb-[50px]">
@@ -50,7 +58,10 @@ function Login() {
               </a>
             </p>
             <h2 className="font-semibold mb-2">Already have an account?</h2>
-            <button className="text-[#1d9bf0] border hover:bg-[#1d9bf0] hover:bg-opacity-10 border-[#1d9bf0] p-2 mb-2 text-center text-sm rounded-3xl w-full font-semibold">
+            <button
+              className="text-[#1d9bf0] border hover:bg-[#1d9bf0] hover:bg-opacity-10 border-[#1d9bf0] p-2 mb-2 text-center text-sm rounded-3xl w-full font-semibold"
+              onClick={() => setShowSignIn(true)}
+            >
               Sign in
             </button>
           </div>
@@ -151,6 +162,16 @@ function Login() {
           <li className="mb-2">© 2023 X Corp.</li>
         </ul>
       </div>
+      {/* Sign-in Modal */}
+      {ShowSignIn && <SigninPopup onClose={() => setShowSignIn(false)} />}
+
+      {/* Create Account Modal */}
+      {showRegister && <RegisterPopup onClose={() => setShowRegister(false)} />}
+
+      {/* Overlay */}
+      {(ShowSignIn || showRegister) && (
+        <div className="fixed inset-0 bg-[#5B7085] opacity-40 z-10"></div>
+      )}
     </div>
   );
 }
