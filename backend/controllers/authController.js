@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { storage } = require("../config/FireConnect");
+const NodeCache = require("node-cache");
 
 const generateTokens = (id, email, username, name) => {
   const accessToken = jwt.sign(
@@ -192,8 +193,11 @@ const sendResetPasswordEmail = async (email, token) => {
     subject: "Password Reset Request",
     html: `<p>Please click the following link to reset your password: <a href="http://localhost:3000/resetPassword/${token}">Reset Password</a></p>`,
   };
-
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (e) {
+    console.log("error when sending the email", e.message);
+  }
 };
 
 const forgotPassword = async (req, res) => {
@@ -247,10 +251,51 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const getVerificationCode = async (req, res) => {
+  const email = req.body.email;
+  if (!email) return res.status(404).json({ message: "Email required" });
+  const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: process.env.SEND_EMAIL,
+      pass: process.env.EMAIL_PWD,
+    },
+  });
+  const code = Math.floor(Math.random() * 90000) + 10000;
+  const mailOptions = {
+    from: process.env.SEND_EMAIL,
+    to: email,
+    subject: "X_clone Verification code",
+    html: `<p>Verification code: ${code}</p>`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    const verificationCache = new NodeCache({ stdTTL: 300 });
+    verificationCache.set(email, code);
+  } catch (e) {
+    console.log("error when sending the email", e.message);
+  }
+};
+
+const verifyCode = async (req, res) => {
+  if (!req.body.code)
+    return res.status(400).json({ message: "Code not found" });
+  const storedCode = verificationCache.get(email);
+  if (storedCode && parseInt(code) === storedCode) {
+    verificationCache.del(email);
+    res.status(200).json({ message: "Code verified successfully" });
+  } else {
+    res.status(400).json({ message: "Invalid code" });
+  }
+};
+
 module.exports = {
   register,
   login,
   handleGoogleAuth,
   forgotPassword,
   resetPassword,
+  getVerificationCode,
+  verifyCode,
 };

@@ -7,3 +7,17 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+export const sendCode = async (email) => {
+  try {
+    const response = await api.post("/register/getVerificationCode", email);
+    return response.data;
+  } catch (err) {}
+};
+
+export const verifyCode = async (code) => {
+  try {
+    const response = await api.post("/register/verifyCode", code);
+    return response.data;
+  } catch (err) {}
+};
