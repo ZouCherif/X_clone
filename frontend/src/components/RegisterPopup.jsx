@@ -5,8 +5,10 @@ import { MdDone } from "react-icons/md";
 import { useState } from "react";
 import { sendCode, verifyCode, createUser } from "../utils/api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const RegisterPopup = ({ onClose }) => {
+  const { setToken } = useAuth();
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -66,7 +68,8 @@ const RegisterPopup = ({ onClose }) => {
     try {
       const response = await createUser(data);
       console.log(response);
-      navigate("/");
+      setToken(response.accessToken);
+      navigate("/login/flow");
     } catch (err) {
       console.log(err);
     }

@@ -81,3 +81,9 @@
 20231231	01:26:29	5a1896b4-e3d3-4088-9d2b-a966f401f346	POST	/register/verifyCode	http://localhost:3000
 20231231	01:26:35	a31fc6ac-2ece-4dcf-aa80-dcc3713b6fd1	OPTIONS	/register	http://localhost:3000
 20231231	01:26:35	fb5cc83a-d61e-47fd-8539-4639d030ec15	POST	/register	http://localhost:3000
+20231231	19:15:19	cd6d6eee-2135-4e77-8cd9-e8a9620be9c0	OPTIONS	/register/getVerificationCode	http://localhost:3000
+20231231	19:15:19	b5b964a3-8533-4eac-9511-4db00431c000	POST	/register/getVerificationCode	http://localhost:3000
+20231231	19:15:57	fd149258-8e35-489d-8e00-c551c9ef9907	OPTIONS	/register/verifyCode	http://localhost:3000
+20231231	19:15:57	2c48c64f-3d33-45bd-b6a9-906061aaf68f	POST	/register/verifyCode	http://localhost:3000
+20231231	19:16:04	7094f07b-a94e-4a75-9662-12bd233a62dd	OPTIONS	/register	http://localhost:3000
+20231231	19:16:04	ee3ddb05-a53c-4bf9-90bc-62a819ccde1a	POST	/register	http://localhost:3000

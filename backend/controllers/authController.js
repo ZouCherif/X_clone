@@ -26,6 +26,29 @@ const generateTokens = (id, email, username, name) => {
   return { accessToken, refreshToken };
 };
 
+const generateRandomString = () => {
+  const randomString = Math.random().toString(36).substring(2, 6);
+  const firstChar = Math.floor(Math.random() * 9) + 1;
+  return `${firstChar}${randomString.substring(1)}`;
+};
+
+const generateUsername = async (name) => {
+  let username = name.replace(/\s+/g, "");
+  username = username.substring(0, Math.min(username.length, 11)); // Limit username length to 11 characters
+
+  const randomString = generateRandomString();
+  username = `${username}${randomString}`;
+  let exists = await User.findOne({ username }).exec();
+
+  while (exists) {
+    username = `${username}${generateRandomString()}`;
+    username = username.substring(0, Math.min(username.length, 15));
+    exists = await User.findOne({ username }).exec();
+  }
+
+  return username;
+};
+
 const register = async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password)
@@ -35,10 +58,12 @@ const register = async (req, res) => {
     return res.status(400).json({ message: "email already in use" });
   try {
     const hashedpwd = await bcrypt.hash(password, 10);
+    const username = await generateUsername(name);
 
     const newUser = await User.create({
       name,
       email,
+      username,
       password: hashedpwd,
     });
     // if (picture) {
@@ -51,31 +76,31 @@ const register = async (req, res) => {
     //   newUser.picture = pictureURL;
     // }
 
-    // const { accessToken, refreshToken } = generateTokens(
-    //   newUser._id,
-    //   newUser.email,
-    //   newUser.username,
-    //   newUser.name
-    // );
+    const { accessToken, refreshToken } = generateTokens(
+      newUser._id,
+      newUser.email,
+      newUser.username,
+      newUser.name
+    );
 
-    // newUser.refreshToken = refreshToken;
-    // await newUser.save();
-    // res.cookie("access_token", accessToken, {
-    //   httpOnly: true,
-    //   secure: true,
-    //   sameSite: "None",
-    //   maxAge: 30 * 60 * 1000,
-    // });
+    newUser.refreshToken = refreshToken;
+    await newUser.save();
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 30 * 60 * 1000,
+    });
 
-    // res.cookie("refresh_token", refreshToken, {
-    //   httpOnly: true,
-    //   secure: true,
-    //   sameSite: "None",
-    //   maxAge: 24 * 60 * 60 * 1000,
-    // });
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
     res.status(201).json({
       message: `New user ${newUser.name} created!`,
-      // accessToken,
+      accessToken,
     });
   } catch (e) {
     res.status(500).json({ message: e.message });
