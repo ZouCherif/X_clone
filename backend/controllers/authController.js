@@ -1,8 +1,10 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { storage } = require("../config/FireConnect");
+// const { storage } = require("../config/FireConnect");
 const NodeCache = require("node-cache");
+const nodemailer = require("nodemailer");
+const verificationCache = new NodeCache();
 
 const generateTokens = (id, email, username, name) => {
   const accessToken = jwt.sign(
@@ -25,56 +27,55 @@ const generateTokens = (id, email, username, name) => {
 };
 
 const register = async (req, res) => {
-  const { name, email, password, picture, username } = req.body;
-  if (!name || !email || !password || !date_of_birth)
+  const { name, email, password } = req.body;
+  if (!name || !email || !password)
     return res.status(400).json({ message: "all infomations are required" });
   const duplicate = await User.findOne({ email: email });
   if (duplicate)
     return res.status(400).json({ message: "email already in use" });
   try {
-    const hashedpwd = bcrypt.hash(password, 10);
+    const hashedpwd = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
       name,
       email,
       password: hashedpwd,
-      username,
     });
-    if (picture) {
-      const storageRef = storage.ref();
-      const pictureRef = storageRef.child(
-        `/users/${newUser._id}/profile_picture/user_${username}_${Date.now()}`
-      );
-      await pictureRef.put(picture);
-      const pictureURL = await pictureRef.getDownloadURL();
-      newUser.picture = pictureURL;
-    }
+    // if (picture) {
+    //   const storageRef = storage.ref();
+    //   const pictureRef = storageRef.child(
+    //     `/users/${newUser._id}/profile_picture/user_${username}_${Date.now()}`
+    //   );
+    //   await pictureRef.put(picture);
+    //   const pictureURL = await pictureRef.getDownloadURL();
+    //   newUser.picture = pictureURL;
+    // }
 
-    const { accessToken, refreshToken } = generateTokens(
-      newUser._id,
-      newUser.email,
-      newUser.username,
-      newUser.name
-    );
+    // const { accessToken, refreshToken } = generateTokens(
+    //   newUser._id,
+    //   newUser.email,
+    //   newUser.username,
+    //   newUser.name
+    // );
 
-    newUser.refreshToken = refreshToken;
-    await newUser.save();
-    res.cookie("access_token", accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 30 * 60 * 1000,
-    });
+    // newUser.refreshToken = refreshToken;
+    // await newUser.save();
+    // res.cookie("access_token", accessToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: "None",
+    //   maxAge: 30 * 60 * 1000,
+    // });
 
-    res.cookie("refresh_token", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    // res.cookie("refresh_token", refreshToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: "None",
+    //   maxAge: 24 * 60 * 60 * 1000,
+    // });
     res.status(201).json({
-      message: `New user ${username} created!`,
-      accessToken,
+      message: `New user ${newUser.name} created!`,
+      // accessToken,
     });
   } catch (e) {
     res.status(500).json({ message: e.message });
@@ -271,8 +272,7 @@ const getVerificationCode = async (req, res) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    const verificationCache = new NodeCache({ stdTTL: 300 });
-    verificationCache.set(email, code);
+    verificationCache.set(email, code, 3600);
   } catch (e) {
     console.log("error when sending the email", e.message);
   }
@@ -281,6 +281,8 @@ const getVerificationCode = async (req, res) => {
 const verifyCode = async (req, res) => {
   if (!req.body.code)
     return res.status(400).json({ message: "Code not found" });
+  const email = req.body.email;
+  const code = req.body.code;
   const storedCode = verificationCache.get(email);
   if (storedCode && parseInt(code) === storedCode) {
     verificationCache.del(email);

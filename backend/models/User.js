@@ -18,7 +18,7 @@ const userSchema = mongoose.Schema({
   },
   username: {
     type: "string",
-    required: true,
+    // required: true,
     unique: true,
   },
   posts: [

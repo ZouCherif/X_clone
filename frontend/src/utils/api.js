@@ -10,14 +10,21 @@ const api = axios.create({
 
 export const sendCode = async (email) => {
   try {
-    const response = await api.post("/register/getVerificationCode", email);
+    const response = await api.post("/register/getVerificationCode", { email });
     return response.data;
   } catch (err) {}
 };
 
-export const verifyCode = async (code) => {
+export const verifyCode = async (data) => {
   try {
-    const response = await api.post("/register/verifyCode", code);
+    const response = await api.post("/register/verifyCode", data);
+    return response.data;
+  } catch (err) {}
+};
+
+export const createUser = async (data) => {
+  try {
+    const response = await api.post("/register", data);
     return response.data;
   } catch (err) {}
 };

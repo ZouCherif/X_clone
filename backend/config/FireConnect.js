@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
-import firebase from "firebase/app";
+// import firebase from "firebase/app";
+const firebase = require("firebase/app");
 require("firebase/storage");
 require("firebase/firestore");
 // import { getAnalytics } from "firebase/analytics";

@@ -3,17 +3,21 @@ import { IoIosClose } from "react-icons/io";
 import { FaArrowLeft } from "react-icons/fa6";
 import { MdDone } from "react-icons/md";
 import { useState } from "react";
-import { sendCode, verifyCode } from "../utils/api";
+import { sendCode, verifyCode, createUser } from "../utils/api";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPopup = ({ onClose }) => {
   const [data, setData] = useState({
     name: "",
     email: "",
+    password: "",
   });
   const [code, setCode] = useState("");
-
   const [isEmailValid, setEmailValidity] = useState(true);
+  const [isPasswordValid, setPasswordValidity] = useState(true);
+  const [isCodeValid, setCodeValidity] = useState(true);
   const [view, setView] = useState(1);
+  const navigate = useNavigate();
 
   const handleInput = (e) => {
     setData({
@@ -29,7 +33,7 @@ const RegisterPopup = ({ onClose }) => {
   const sendVerificationCode = async () => {
     try {
       sendCode(data.email);
-      if (view !== 4) {
+      if (view !== 3) {
         setView(view + 1);
       }
     } catch (e) {
@@ -39,12 +43,35 @@ const RegisterPopup = ({ onClose }) => {
 
   const verifyMyCode = async () => {
     try {
-      const response = await verifyCode(code);
-      setView(view + 1);
+      if (code.length > 4) {
+        const response = await verifyCode({ code, email: data.email });
+        if (response?.status === 400) {
+          setCodeValidity(false);
+          return;
+        }
+        setView(view + 1);
+      } else {
+        setCodeValidity(false);
+      }
     } catch (e) {
       console.log(e.message);
+      setCodeValidity(false);
     }
   };
+
+  const handleSubmit = async () => {
+    if (!isPasswordValid) {
+      setPasswordValidity(false);
+    }
+    try {
+      const response = await createUser(data);
+      console.log(response);
+      navigate("/");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const isFormValid =
     data.name.trim() !== "" && data.email.trim() !== "" && isEmailValid;
 
@@ -200,26 +227,49 @@ const RegisterPopup = ({ onClose }) => {
             </span>
           </div>
         </div>
-        <div className={`px-4 ${view === 2 ? "block" : "hidden"} `}>
-          <h1 className="text-3xl font-bold mb-4">Verification code</h1>
-          <p className="text-xs text-gray-500">
-            Enter the code sent to ${data.email}.
+        <div className={`px-4 ${view === 3 ? "block" : "hidden"} `}>
+          <h1 className="text-3xl font-bold mb-2">Verification code</h1>
+          <p className="text-xs text-gray-500 mb-1">
+            Enter the code sent to {data.email}.
           </p>
           <input
-            type="number"
+            type="text"
             name="code"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             autoComplete="off"
             placeholder="Code"
-            className="bg-black border border-gray-600 w-full mb-8 px-2 py-3 rounded-md"
+            required
+            className="bg-black border border-gray-600 w-full mb-2 px-2 py-3 rounded-md"
           />
+          {!isCodeValid && (
+            <p className="text-red-500 text-xs">Please enter a valid code.</p>
+          )}
           <p
             className="text-xs text-[#1d9bf0] hover:underline cursor-pointer"
             onClick={sendVerificationCode}
           >
             Didn't receive an email?
           </p>
+        </div>
+        <div className={`px-4 ${view === 4 ? "block" : "hidden"} `}>
+          <h1 className="text-3xl font-bold mb-4">You'll need a password</h1>
+          <p className="text-xs text-gray-500">
+            {" "}
+            Make sure it's 8 characters or more.
+          </p>
+          <input
+            type="text"
+            name="password"
+            value={data.password}
+            onChange={handleInput}
+            autoComplete="off"
+            placeholder="Password"
+            className="bg-black border border-gray-600 w-full mb-2 px-2 py-3 rounded-md"
+          />
+          {!isPasswordValid && (
+            <p className="text-red-500 text-xs">Weak password.</p>
+          )}
         </div>
       </div>
       <div className="py-4 px-16 fixed bottom-0 w-full">
@@ -245,33 +295,47 @@ const RegisterPopup = ({ onClose }) => {
             Learn more
           </a>
         </p>
-        <button
-          className={`bg-white text-black font-semibold p-2 rounded-3xl w-full ${
-            isFormValid ? "" : "opacity-50 cursor-not-allowed"
-          } ${view !== 2 ? "block" : "hidden"}`}
-          disabled={!isFormValid}
-          onClick={() => {
-            if (view === 1) {
-              setView(view + 1);
-            } else {
+        {view === 1 && (
+          <button
+            className={`bg-white text-black font-semibold p-2 rounded-3xl w-full ${
+              isFormValid ? "" : "opacity-50 cursor-not-allowed"
+            }`}
+            disabled={!isFormValid}
+            onClick={() => setView(view + 1)}
+          >
+            Next
+          </button>
+        )}
+        {view === 2 && (
+          <button
+            className="bg-[#1d9bf0] p-2 text-center text-sm rounded-3xl w-full font-bold"
+            onClick={sendVerificationCode}
+          >
+            Sign Up
+          </button>
+        )}
+        {view === 3 && (
+          <button
+            className="bg-white text-black font-semibold p-2 rounded-3xl w-full"
+            onClick={() => {
               try {
                 verifyMyCode();
               } catch (e) {
                 console.log(e.message);
               }
-            }
-          }}
-        >
-          Next
-        </button>
-        <button
-          className={`bg-[#1d9bf0] p-2 text-center text-sm rounded-3xl w-full font-bold ${
-            view === 2 ? "block" : "hidden"
-          }`}
-          onClick={sendVerificationCode}
-        >
-          Sign Up
-        </button>
+            }}
+          >
+            Next
+          </button>
+        )}
+        {view === 4 && (
+          <button
+            className="bg-white text-black font-semibold p-2 rounded-3xl w-full"
+            onClick={handleSubmit}
+          >
+            Next
+          </button>
+        )}
       </div>
     </div>
   );
