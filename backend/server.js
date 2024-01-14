@@ -20,6 +20,7 @@ app.use(cookieParser());
 
 app.use("/register", require("./routes/auth/register"));
 app.use("/login", require("./routes/auth/login"));
+app.use("/assets", require("./routes/assets/assets"));
 
 app.all("*", (req, res) => {
   res.status(404);

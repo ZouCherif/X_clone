@@ -1,2 +1,4 @@
 20231231	00:29:41	21b22484-97a2-432d-aa65-7f692d721dfc	SyntaxError	Unexpected token " in JSON at position 0	POST	/register/getVerificationCode	Unknown
 20231231	00:32:56	2faf6d90-73cd-4ea0-bf3f-62322df0abbd	SyntaxError	Unexpected token " in JSON at position 0	POST	/register/getVerificationCode	Unknown
+20240114	18:43:47	e936e739-cb7f-443a-a27c-4340ad2994da	MulterError	Unexpected field	POST	/assets	Unknown
+20240114	18:44:22	4c586756-b216-42c4-85c9-656cc9da4894	MulterError	Unexpected field	POST	/assets	Unknown

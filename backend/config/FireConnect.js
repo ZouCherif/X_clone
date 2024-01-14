@@ -1,16 +1,10 @@
-// Import the functions you need from the SDKs you need
-// import firebase from "firebase/app";
-const firebase = require("firebase/app");
-require("firebase/storage");
-require("firebase/firestore");
-// import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+const { initializeApp } = require("firebase/app");
+const multer = require("multer");
+const { getStorage } = require("firebase/storage");
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-
+// var serviceAccount = require("./xclone-927-firebase-adminsdk-14pp3-ee1ef5e83f.json");
 const firebaseConfig = {
+  // credential: admin.credential.cert(serviceAccount),
   apiKey: "AIzaSyDSbBSR4eh8YZYzJ0l34lTLQpdYQcguyNw",
   authDomain: "xclone-927.firebaseapp.com",
   projectId: "xclone-927",
@@ -20,13 +14,10 @@ const firebaseConfig = {
   measurementId: "G-T6PY6V54M8",
 };
 
-// // Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
-firebase.initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
+const storage = getStorage();
+const upload = multer({ storage: multer.memoryStorage() });
 
-const storage = firebase.storage();
-const firestore = firebase.firestore();
 console.log("Initializing Firebase");
 
-module.exports = { storage, firestore };
+module.exports = { storage, upload };

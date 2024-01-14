@@ -1,7 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-// const { storage } = require("../config/FireConnect");
 const NodeCache = require("node-cache");
 const nodemailer = require("nodemailer");
 const verificationCache = new NodeCache();
@@ -66,15 +65,6 @@ const register = async (req, res) => {
       username,
       password: hashedpwd,
     });
-    // if (picture) {
-    //   const storageRef = storage.ref();
-    //   const pictureRef = storageRef.child(
-    //     `/users/${newUser._id}/profile_picture/user_${username}_${Date.now()}`
-    //   );
-    //   await pictureRef.put(picture);
-    //   const pictureURL = await pictureRef.getDownloadURL();
-    //   newUser.picture = pictureURL;
-    // }
 
     const { accessToken, refreshToken } = generateTokens(
       newUser._id,
@@ -89,7 +79,7 @@ const register = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      maxAge: 30 * 60 * 1000,
+      maxAge: 59 * 60 * 1000,
     });
 
     res.cookie("refresh_token", refreshToken, {
@@ -133,7 +123,7 @@ const login = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      maxAge: 30 * 60 * 1000, // 59 minutes
+      maxAge: 59 * 60 * 1000, // 59 minutes
       //domain: "localhost",
     });
     res.cookie("refresh_token", refreshToken, {
@@ -183,7 +173,7 @@ const handleGoogleAuth = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      maxAge: 30 * 60 * 1000,
+      maxAge: 59 * 60 * 1000,
     });
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
