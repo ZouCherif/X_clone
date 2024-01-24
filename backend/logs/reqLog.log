@@ -162,3 +162,4 @@
 20240119	12:48:41	073e3923-4089-485e-982a-fcda42a64649	OPTIONS	/register	http://localhost:3000
 20240119	12:48:41	ce4f2403-cd68-4f4a-bdbb-3a922db6a8e0	POST	/register	http://localhost:3000
 20240119	12:48:54	304be97b-81ac-4059-b572-836ff1d79d2d	POST	/assets	http://localhost:3000
+20240119	13:06:27	422fe675-850a-498d-9488-70821b58775a	GET	/categories	http://localhost:3000
