@@ -2,7 +2,7 @@ import { useState } from "react";
 import { logo } from "../assets";
 import DropZoneBtn from "./DropZoneBtn";
 import { addProfilePicture } from "../utils/api";
-function RegisterFlowPopup() {
+function AddProfilePicPopup() {
   const [image, setImage] = useState(null);
 
   const uploadImage = async () => {
@@ -46,4 +46,4 @@ function RegisterFlowPopup() {
   );
 }
 
-export default RegisterFlowPopup;
+export default AddProfilePicPopup;

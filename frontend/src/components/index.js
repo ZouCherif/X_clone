@@ -1,5 +1,6 @@
 import RegisterPopup from "./RegisterPopup";
 import SigninPopup from "./SigninPopup";
-import RegisterFlowPopup from "./RegisterFlowPopup";
+import AddProfilePicPopup from "./AddProfilePicPopup";
+import AddUsernamePopup from "./AddUsernamePopup";
 
-export { RegisterPopup, SigninPopup, RegisterFlowPopup };
+export { RegisterPopup, SigninPopup, AddProfilePicPopup, AddUsernamePopup };
